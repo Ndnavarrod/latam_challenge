@@ -9,7 +9,6 @@ from pyspark.sql.window import Window
 from pyspark.sql.functions import row_number
 from memory_profiler import profile
 
-@profile
 def q1_time(file_path: str) -> List[Tuple[datetime.date, str]]:
         #El proceso se hace con spark para trabajar la informacion de manera columnar. 
         spark = SparkSession.builder.appName('sparkdf').getOrCreate() 
