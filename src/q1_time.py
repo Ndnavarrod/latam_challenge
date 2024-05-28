@@ -30,9 +30,6 @@ def q1_time(file_path: str) -> List[Tuple[datetime.date, str]]:
         ranked_users = user_counts.withColumn("rank", row_number().over(window_spec)).filter(col("rank") == 1)
         result = ranked_users.select("date", "user")
         
-        result_list = [
-            (row['date'], row['user'])
-            for row in result.collect()
-        ]
+        result_list:List[Tuple[str, int]] = [(row['date'], row['user'])for row in result.collect()]
         spark.stop()
         return(result_list)

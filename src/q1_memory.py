@@ -71,7 +71,7 @@ def q1_memory(file_path: str) -> List[Tuple[datetime.date, str]]:
     
     result = final_ranked_users.select("date", "user")
     
-    result_list = [(row['date'], row['user']) for row in result.collect()]
+    result_list:List[Tuple[str, int]] = [(row['date'], row['user']) for row in result.collect()]
     spark.stop()
     
     return result_list

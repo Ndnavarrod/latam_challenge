@@ -49,7 +49,7 @@ def q2_memory(file_path: str) -> List[Tuple[str, int]]:
     emoji_counts = count_each_emoji(single_string)
     
     # Convert the counter to a list of tuples and sort by count in descending order
-    sorted_emoji_counts = sorted(emoji_counts.items(), key=lambda x: x[1], reverse=True)
+    sorted_emoji_counts :List[Tuple[str, int]] = sorted(emoji_counts.items(), key=lambda x: x[1], reverse=True)
     
     # Return the top 10 emojis
     return sorted_emoji_counts[:10]

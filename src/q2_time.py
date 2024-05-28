@@ -28,5 +28,5 @@ def q2_time(file_path: str) -> List[Tuple[str, int]]:
     # Sorted the emojis having first the emojis with more repetition
     sorted_emoji_counts = sorted(lista, key=lambda x: x[1], reverse=True)
     #Take the first 10
-    top_10 = sorted_emoji_counts[:10]
+    top_10 :List[Tuple[str, int]] = sorted_emoji_counts[:10]
     return top_10
