@@ -11,12 +11,13 @@ from memory_profiler import profile
 
 @profile
 def q1_time(file_path: str) -> List[Tuple[datetime.date, str]]:
+        #El proceso se hace con spark para trabajar la informacion de manera columnar. 
         spark = SparkSession.builder.appName('sparkdf').getOrCreate() 
-        with open(file_path, 'r') as f:
-            data = [[json.loads(line)['date'].split('T')[0], json.loads(line)['user']['username']]  for line in f.readlines()]
-        columns=['date','user']
+        df = spark.read.json(file_path)
+        df = df.withColumn("date", col("date").substr(1, 10))
+        df = df.select("date", col("user.username").alias("user")).dropna()
+        
 
-        df = spark.createDataFrame(data, columns) 
         date_counts = df.groupBy("date").count().orderBy(desc("count"))
 
 
