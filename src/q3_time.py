@@ -1,34 +1,30 @@
+
+from pyspark.sql import SparkSession
 from typing import List, Tuple
-import json
-def extract_usernames(data):
-    usernames = []
-    for entry in data:
-        if isinstance(entry, list):
-            for user in entry:
-                if isinstance(user, dict) and 'username' in user:
-                    usernames.append(user['username'])
-                else:
-                    print(f"Warning: 'username' key not found in user entry: {user}")
-        elif entry is None:
-            continue
-       
-    return usernames
+from pyspark.sql.functions import col, count,desc
+from pyspark.sql.functions import explode
 
 def q3_time(file_path: str) -> List[Tuple[str, int]]:
-    # En este caso como la mencion no existe en todos los twitss se agrega una validacion de que si exista.
-    data = []
-    with open(file_path, 'r') as f:
-        for line in f:
-            try:
-                json_line = json.loads(line)
-                if 'mentionedUsers' in json_line:
-                    data.append(json_line['mentionedUsers'])
-                else:
-                    continue
-            except json.JSONDecodeError:
-                print(f"Error: Invalid JSON format in line: {line.strip()}")
-    usernames = extract_usernames(data)
-    print(usernames)
+    #Create the spark session
 
- 
-q3_time('src/farmers-protest-tweets-2021-2-4.json')
+    spark = SparkSession.builder.appName('sparkdf').getOrCreate() 
+    df = spark.read.json(file_path)
+
+    #Only keep the  column that need that is user list mentioned and drop the none values
+    df = df.select( col("mentionedUsers.username").alias("user")).dropna()
+
+    #Expand the list of user to have one row per each mention in a twitt
+    df_expanded = df.select(explode(df.user).alias("user"))
+
+    #Count The repetion of the name using group by 
+    df_counts=df_expanded.groupBy('user').count()
+
+    #Limit only the top 10 
+    top_10= df_counts.orderBy(col("count").desc()).limit(10)
+
+    #Put in the requeired output expected values 
+    top_10_list: List[Tuple[str, int]] = [(row["user"], row["count"]) for row in top_10.collect()]
+  
+    return top_10_list
+
+
